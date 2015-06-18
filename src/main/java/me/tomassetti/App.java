@@ -2,6 +2,8 @@ package me.tomassetti;
 
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.asset.AssetLoader;
+import com.jme3.asset.plugins.FileLocator;
 import com.jme3.material.Material;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
@@ -27,8 +29,8 @@ public class App extends SimpleApplication {
     @Override
     public void simpleInitApp() {
         flyCam.setMoveSpeed(50);
-        
-        assetManager.registerLoader();
+
+        assetManager.registerLocator(".", FileLocator.class);
 
         /** 1. Create terrain material and load four textures into it. */
         mat_terrain = new Material(assetManager,
