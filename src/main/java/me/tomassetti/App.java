@@ -12,6 +12,8 @@ import com.jme3.terrain.heightmap.ImageBasedHeightMap;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.WrapMode;
 
+import java.io.File;
+
 /**
  * Sample 10 - How to create fast-rendering terrains from heightmaps,
  * and how to use texture splatting to make the terrain look good.
@@ -35,10 +37,13 @@ public class App extends SimpleApplication {
         /** 1. Create terrain material and load four textures into it. */
         mat_terrain = new Material(assetManager,
                 "Common/MatDefs/Terrain/Terrain.j3md");
+        
+        String worldEngineFile = "seed_64513.world";
 
         /** 1.1) Add ALPHA map (for red-blue-green coded splat textures) */
-        mat_terrain.setTexture("Alpha", assetManager.loadTexture(
-                "Textures/Terrain/splat/alphamap.png"));
+        /*mat_terrain.setTexture("Alpha", assetManager.loadTexture(
+                "Textures/Terrain/splat/alphamap.png"));*/
+        mat_terrain.setTexture("Alpha", new WorldEngineTexture(worldEngineFile));
 
         /** 1.2) Add GRASS texture into the red layer (Tex1). */
         Texture grass = assetManager.loadTexture(
@@ -66,7 +71,7 @@ public class App extends SimpleApplication {
         /*Texture heightMapImage = assetManager.loadTexture(
                 "Textures/Terrain/splat/mountains512.png");
         heightmap = new ImageBasedHeightMap(heightMapImage.getImage());*/
-        heightmap = new WorldEngineHeightMap("seed_64513.world");
+        heightmap = new WorldEngineHeightMap(worldEngineFile);
         heightmap.load();
 
         /** 3. We have prepared material and heightmap.
