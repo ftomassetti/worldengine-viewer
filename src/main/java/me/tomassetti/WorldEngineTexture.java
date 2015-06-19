@@ -18,24 +18,35 @@ public class WorldEngineTexture extends Texture2D {
     public WorldEngineTexture(String fileName){
         final int width = 512;
         final int height = 512;
+        final int scale = 2;
         try {
             
             WorldFile.World worldFile = WorldFile.World.parseFrom(new FileInputStream(new File(fileName)));
-            ByteBuffer data = ByteBuffer.allocateDirect(width * height * 3);
+            ByteBuffer data = ByteBuffer.allocateDirect(width * height * 3 * scale * scale);
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
                     if (worldFile.getOcean().getRows(y).getCells(x)) {
-                        data.put((y * width + x) * 3 + 0, (byte) 0);
-                        data.put((y * width + x) * 3 + 1, (byte) 255);
-                        data.put((y * width + x) * 3 + 2, (byte) 0);
+                        for (int iy=0;iy<scale;iy++){
+                            for (int ix=0;ix<scale;ix++){
+                                int baseY = (y+iy) * width * scale;
+                                data.put((baseY + (x * scale)  +ix )* 3 + 0, (byte) 0);
+                                data.put((baseY + (x * scale)  +ix )* 3 + 1, (byte) 255);
+                                data.put((baseY + (x * scale)  +ix )* 3 + 2, (byte) 0);
+                            }
+                        }
                     } else {
-                        data.put((y * width + x) * 3 + 0, (byte) 255);
-                        data.put((y * width + x) * 3 + 1, (byte) 0);
-                        data.put((y * width + x) * 3 + 2, (byte) 0);
+                        for (int iy=0;iy<scale;iy++){
+                            for (int ix=0;ix<scale;ix++){
+                                int baseY = (y+iy) * width * scale;
+                                data.put((baseY + (x * scale)  +ix )* 3 + 0, (byte) 255);
+                                data.put((baseY + (x * scale)  +ix )* 3 + 1, (byte) 0);
+                                data.put((baseY + (x * scale)  +ix )* 3 + 2, (byte) 0);
+                            }
+                        }
                     }
                 }
             }
-            Image img = new Image(Image.Format.RGB8, width, height, data);
+            Image img = new Image(Image.Format.RGB8, width * scale, height * scale, data);
             this.setImage(img);
         } catch (IOException e){
             throw new RuntimeException(e);
