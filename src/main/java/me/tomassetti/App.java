@@ -5,12 +5,18 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetLoader;
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.material.Material;
+import com.jme3.math.*;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.Node;
+import com.jme3.scene.shape.Quad;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.heightmap.AbstractHeightMap;
 import com.jme3.terrain.heightmap.ImageBasedHeightMap;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.WrapMode;
+import com.jme3.water.SimpleWaterProcessor;
+import com.sun.scenario.effect.AbstractShadow;
 
 import java.io.File;
 
@@ -54,7 +60,7 @@ public class App extends SimpleApplication {
 
         /** 1.3) Add DIRT texture into the green layer (Tex2) */
         Texture dirt = assetManager.loadTexture(
-                "Textures/Terrain/splat/dirt.jpg");
+                "Textures/Terrain/splat/water.jpg");
         dirt.setWrap(WrapMode.Repeat);
         mat_terrain.setTexture("Tex2", dirt);
         mat_terrain.setFloat("Tex2Scale", 32f);
@@ -94,5 +100,33 @@ public class App extends SimpleApplication {
         /** 5. The LOD (level of detail) depends on were the camera is: */
         TerrainLodControl control = new TerrainLodControl(terrain, getCamera());
         terrain.addControl(control);
+        
+        //Node node = terrain;
+
+        // we create a water processor
+        SimpleWaterProcessor waterProcessor = new SimpleWaterProcessor(assetManager);
+        waterProcessor.setReflectionScene(terrain);
+
+        // we set the water plane
+        Vector3f waterLocation=new Vector3f(0,-6,0);
+        waterProcessor.setPlane(new Plane(Vector3f.UNIT_Y, waterLocation.dot(Vector3f.UNIT_Y)));
+        viewPort.addProcessor(waterProcessor);
+
+        // we set wave properties
+        waterProcessor.setWaterDepth(40);         // transparency of water
+        waterProcessor.setDistortionScale(0.05f); // strength of waves
+        waterProcessor.setWaveSpeed(0.05f);       // speed of waves
+
+        // we define the wave size by setting the size of the texture coordinates
+        Quad quad = new Quad(400,400);
+        quad.scaleTextureCoordinates(new Vector2f(6f,6f));
+
+        // we create the water geometry from the quad
+        Geometry water=new Geometry("water", quad);
+        water.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
+        water.setLocalTranslation(-200, -6, 2);
+        //water.setShadowMode(AbstractShadow.ShadowMode.Receive);
+        water.setMaterial(waterProcessor.getMaterial());
+        rootNode.attachChild(water);
     }
 }
