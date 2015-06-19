@@ -33,7 +33,7 @@ public class WorldEngineHeightMap extends AbstractHeightMap {
                         value = 0.0f;
                         //value = 10.0f;
                     } else {
-                        value = 1.0f + (float)(2.0f*row.getCells(x));
+                        value = 0.0f + (float)(2.0f*row.getCells(x));
                     }
                     this.heightData[(worldFile.getHeight() - y - 1) * worldFile.getWidth() + x] = value;
                 }

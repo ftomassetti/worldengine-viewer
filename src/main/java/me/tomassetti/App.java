@@ -4,10 +4,23 @@ package me.tomassetti;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetLoader;
 import com.jme3.asset.plugins.FileLocator;
+import com.jme3.bullet.BulletAppState;
+import com.jme3.bullet.collision.shapes.CapsuleCollisionShape;
+import com.jme3.bullet.collision.shapes.CollisionShape;
+import com.jme3.bullet.control.BetterCharacterControl;
+import com.jme3.bullet.control.CharacterControl;
+import com.jme3.bullet.control.RigidBodyControl;
+import com.jme3.bullet.util.CollisionShapeFactory;
+import com.jme3.input.KeyInput;
+import com.jme3.input.controls.ActionListener;
+import com.jme3.input.controls.KeyTrigger;
+import com.jme3.light.AmbientLight;
+import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.math.*;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Quad;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
@@ -24,8 +37,20 @@ import java.io.File;
  * Sample 10 - How to create fast-rendering terrains from heightmaps,
  * and how to use texture splatting to make the terrain look good.
  */
-public class App extends SimpleApplication {
+public class App extends SimpleApplication implements ActionListener {
 
+    //private Spatial sceneModel;
+    private BulletAppState bulletAppState;
+    private RigidBodyControl landscape;
+    private CharacterControl player;
+    private Vector3f walkDirection = new Vector3f();
+    private boolean left = false, right = false, up = false, down = false;
+
+    //Temporary vectors used on each frame.
+    //They here to avoid instanciating new vectors on each frame
+    private Vector3f camDir = new Vector3f();
+    private Vector3f camLeft = new Vector3f();
+    
     private TerrainQuad terrain;
     Material mat_terrain;
 
@@ -36,7 +61,15 @@ public class App extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
-        flyCam.setMoveSpeed(50);
+        bulletAppState = new BulletAppState();
+        stateManager.attach(bulletAppState);
+        
+        flyCam.setMoveSpeed(9000000);
+
+        setUpKeys();
+        setUpLight();
+
+        
 
         assetManager.registerLocator(".", FileLocator.class);
 
@@ -95,7 +128,7 @@ public class App extends SimpleApplication {
         terrain.setMaterial(mat_terrain);
         terrain.setLocalTranslation(0, -100, 0);
         terrain.setLocalScale(2f, 1f, 2f);
-        rootNode.attachChild(terrain);
+        //rootNode.attachChild(terrain);
 
         /** 5. The LOD (level of detail) depends on were the camera is: */
         TerrainLodControl control = new TerrainLodControl(terrain, getCamera());
@@ -128,5 +161,94 @@ public class App extends SimpleApplication {
         //water.setShadowMode(AbstractShadow.ShadowMode.Receive);
         water.setMaterial(waterProcessor.getMaterial());
         rootNode.attachChild(water);
+
+        CollisionShape sceneShape =
+                CollisionShapeFactory.createMeshShape((Node) terrain);
+        landscape = new RigidBodyControl(sceneShape, 0);
+        terrain.addControl(landscape);
+
+        CapsuleCollisionShape capsuleShape = new CapsuleCollisionShape(1.5f, 6f, 1);
+        player = new CharacterControl(capsuleShape, 0.05f);
+        player.setJumpSpeed(200000);
+        player.setFallSpeed(300000);
+        player.setGravity(0);
+        player.setPhysicsLocation(new Vector3f(0, 10, 0));
+
+        // We attach the scene and the player to the rootnode and the physics space,
+        // to make them appear in the game world.
+        rootNode.attachChild(terrain);
+        bulletAppState.getPhysicsSpace().add(landscape);
+        bulletAppState.getPhysicsSpace().add(player);
+    }
+
+    private void setUpLight() {
+        // We add light so we see the scene
+        AmbientLight al = new AmbientLight();
+        al.setColor(ColorRGBA.White.mult(1.3f));
+        rootNode.addLight(al);
+
+        DirectionalLight dl = new DirectionalLight();
+        dl.setColor(ColorRGBA.White);
+        dl.setDirection(new Vector3f(2.8f, -2.8f, -2.8f).normalizeLocal());
+        rootNode.addLight(dl);
+    }
+
+    /** We over-write some navigational key mappings here, so we can
+     * add physics-controlled walking and jumping: */
+    private void setUpKeys() {
+        inputManager.addMapping("Left", new KeyTrigger(KeyInput.KEY_A));
+        inputManager.addMapping("Right", new KeyTrigger(KeyInput.KEY_D));
+        inputManager.addMapping("Up", new KeyTrigger(KeyInput.KEY_W));
+        inputManager.addMapping("Down", new KeyTrigger(KeyInput.KEY_S));
+        inputManager.addMapping("Jump", new KeyTrigger(KeyInput.KEY_SPACE));
+        inputManager.addListener(this, "Left");
+        inputManager.addListener(this, "Right");
+        inputManager.addListener(this, "Up");
+        inputManager.addListener(this, "Down");
+        inputManager.addListener(this, "Jump");
+    }
+
+    /**
+     * This is the main event loop--walking happens here.
+     * We check in which direction the player is walking by interpreting
+     * the camera direction forward (camDir) and to the side (camLeft).
+     * The setWalkDirection() command is what lets a physics-controlled player walk.
+     * We also make sure here that the camera moves with player.
+     */
+    @Override
+    public void simpleUpdate(float tpf) {
+        camDir.set(cam.getDirection()).multLocal(0.6f);
+        camLeft.set(cam.getLeft()).multLocal(0.4f);
+        walkDirection.set(0, 0, 0);
+        if (left) {
+            walkDirection.addLocal(camLeft);
+        }
+        if (right) {
+            walkDirection.addLocal(camLeft.negate());
+        }
+        if (up) {
+            walkDirection.addLocal(camDir);
+        }
+        if (down) {
+            walkDirection.addLocal(camDir.negate());
+        }
+        player.setWalkDirection(walkDirection);
+        cam.setLocation(player.getPhysicsLocation());
+    }
+
+    /** These are our custom actions triggered by key presses.
+     * We do not walk yet, we just keep track of the direction the user pressed. */
+    public void onAction(String binding, boolean isPressed, float tpf) {
+        if (binding.equals("Left")) {
+            left = isPressed;
+        } else if (binding.equals("Right")) {
+            right= isPressed;
+        } else if (binding.equals("Up")) {
+            up = isPressed;
+        } else if (binding.equals("Down")) {
+            down = isPressed;
+        } else if (binding.equals("Jump")) {
+            if (isPressed) { player.jump(); }
+        }
     }
 }
