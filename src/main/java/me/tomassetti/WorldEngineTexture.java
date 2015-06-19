@@ -18,7 +18,7 @@ public class WorldEngineTexture extends Texture2D {
     public WorldEngineTexture(String fileName){
         final int width = 512;
         final int height = 512;
-        final int scale = 2;
+        final int scale = 1;
         try {
             
             WorldFile.World worldFile = WorldFile.World.parseFrom(new FileInputStream(new File(fileName)));
@@ -37,7 +37,7 @@ public class WorldEngineTexture extends Texture2D {
                     } else {
                         for (int iy=0;iy<scale;iy++){
                             for (int ix=0;ix<scale;ix++){
-                                int baseY = (y+iy) * width * scale;
+                                int baseY = (y+iy) * width * scale * scale;
                                 data.put((baseY + (x * scale)  +ix )* 3 + 0, (byte) 255);
                                 data.put((baseY + (x * scale)  +ix )* 3 + 1, (byte) 0);
                                 data.put((baseY + (x * scale)  +ix )* 3 + 2, (byte) 0);

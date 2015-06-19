@@ -26,13 +26,16 @@ public class WorldEngineHeightMap extends AbstractHeightMap {
             this.size = Math.max(worldFile.getWidth(), worldFile.getHeight());
             this.heightData = new float[this.getSize() * this.getSize()];
             for (int y=0;y<worldFile.getHeight();y++) {
-                WorldFile.World.DoubleRow row = worldFile.getHeightMapData().getRows(y % worldFile.getHeight());
+                WorldFile.World.DoubleRow row = worldFile.getHeightMapData().getRows(y);
                 for (int x = 0; x < worldFile.getWidth(); x++) {
-                    float value = (float)(5.0f*row.getCells(x));
-                    if (!worldFile.getOcean().getRows(y).getCells(x)){
-                        value += 1.0f;
+                    float value;
+                    if (worldFile.getOcean().getRows(y).getCells(x)){
+                        value = 0.0f;
+                        //value = 10.0f;
+                    } else {
+                        value = 1.0f + (float)(2.0f*row.getCells(x));
                     }
-                    this.heightData[y * worldFile.getWidth() + x] = value;
+                    this.heightData[(worldFile.getHeight() - y - 1) * worldFile.getWidth() + x] = value;
                 }
             }
             return true;
