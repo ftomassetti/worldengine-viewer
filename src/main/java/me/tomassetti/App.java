@@ -63,9 +63,10 @@ public class App extends SimpleApplication {
 
         /** 2. Create the height map */
         AbstractHeightMap heightmap = null;
-        Texture heightMapImage = assetManager.loadTexture(
+        /*Texture heightMapImage = assetManager.loadTexture(
                 "Textures/Terrain/splat/mountains512.png");
-        heightmap = new ImageBasedHeightMap(heightMapImage.getImage());
+        heightmap = new ImageBasedHeightMap(heightMapImage.getImage());*/
+        heightmap = new WorldEngineHeightMap("seed_64513.world");
         heightmap.load();
 
         /** 3. We have prepared material and heightmap.
