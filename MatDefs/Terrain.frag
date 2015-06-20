@@ -1,12 +1,15 @@
 uniform sampler2D m_Alpha;
+uniform sampler2D m_Alpha2;
 uniform sampler2D m_Tex1;
 uniform sampler2D m_Tex2;
 uniform sampler2D m_Tex3;
 uniform sampler2D m_Tex4;
+uniform sampler2D m_Tex5;
 uniform float m_Tex1Scale;
 uniform float m_Tex2Scale;
 uniform float m_Tex3Scale;
 uniform float m_Tex4Scale;
+uniform float m_Tex5Scale;
 
 varying vec2 texCoord;
 
@@ -20,6 +23,7 @@ void main(void)
 
     // get the alpha value at this 2D texture coord
     vec4 alpha   = texture2D( m_Alpha, texCoord.xy );
+    vec4 alpha2   = texture2D( m_Alpha2, texCoord.xy );
 
 #ifdef TRI_PLANAR_MAPPING
     // tri-planar texture bending factor for this fragment's normal
@@ -55,12 +59,15 @@ void main(void)
 	vec4 tex2    = texture2D( m_Tex2, texCoord.xy * m_Tex2Scale ); // Tile
 	vec4 tex3    = texture2D( m_Tex3, texCoord.xy * m_Tex3Scale ); // Tile
     vec4 tex4    = texture2D( m_Tex4, texCoord.xy * m_Tex4Scale ); // Tile
+    vec4 tex5    = texture2D( m_Tex5, texCoord.xy * m_Tex5Scale ); // Tile
 	
 #endif
 
     vec4 outColor = tex1 * alpha.r; // Red channel
 	outColor = mix( outColor, tex2, alpha.g ); // Green channel
 	outColor = mix( outColor, tex3, alpha.b ); // Blue channel
+    outColor = mix( outColor, tex4, alpha2.r); 
+    outColor = mix( outColor, tex5, alpha2.g); 
 	gl_FragColor = outColor;
 }
 

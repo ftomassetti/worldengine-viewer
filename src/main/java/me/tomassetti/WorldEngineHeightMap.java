@@ -33,15 +33,15 @@ public class WorldEngineHeightMap extends AbstractHeightMap {
                 for (int x = 0; x < worldFile.getWidth(); x++) {
                     float value;
                     if (worldFile.getOcean().getRows(y).getCells(x)){
+                        value = 0.0f + (float)(0.0f*row.getCells(x));
+                        //value = 10.0f;
+                    } else {
                         if (row.getCells(x) < minValue){
                             minValue = (float)row.getCells(x);
                         }
                         if (row.getCells(x) > maxValue){
                             maxValue = (float)row.getCells(x);
                         }
-                        value = 0.0f + (float)(0.0f*row.getCells(x));
-                        //value = 10.0f;
-                    } else {
                         value = 0.0f + (float)(5.0f*row.getCells(x));
                     }
                     this.heightData[(worldFile.getHeight() - y - 1) * worldFile.getWidth() + x] = value;

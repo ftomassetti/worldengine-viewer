@@ -1,8 +1,7 @@
 package me.tomassetti;
 
-import com.jme3.texture.Texture;
-import com.jme3.texture.Texture2D;
 import com.jme3.texture.Image;
+import com.jme3.texture.Texture2D;
 import me.tomassetti.worldengine.WorldFile;
 
 import java.io.File;
@@ -13,11 +12,8 @@ import java.nio.ByteBuffer;
 /**
  * Created by ftomassetti on 19/06/15.
  */
-public class WorldEngineTexture extends Texture2D {
-    
-    public static float MOUNTAIN_LEVEL = 2.5f;
-    public static float HIGH_MOUNTAIN_LEVEL = 5.0f;
-    
+public class WorldEngineTexture2 extends Texture2D {
+
     private boolean isBeach(WorldFile.World worldFile, int x, int y){
         int delta = 2;
         for (int dx=-delta;dx<=delta && (dx+x)>=0 && (dx+x)<worldFile.getWidth();dx++){
@@ -30,7 +26,7 @@ public class WorldEngineTexture extends Texture2D {
         return false;
     }
 
-    public WorldEngineTexture(String fileName){
+    public WorldEngineTexture2(String fileName){
         final int scale = 1;
         try {
             
@@ -40,40 +36,29 @@ public class WorldEngineTexture extends Texture2D {
             ByteBuffer data = ByteBuffer.allocateDirect(width * height * 3 * scale * scale);
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
-                    if (worldFile.getOcean().getRows(y).getCells(x)) {
+                    if (!worldFile.getOcean().getRows(y).getCells(x)) {
                         double elev = worldFile.getHeightMapData().getRows(y).getCells(x);
-                        if (isBeach(worldFile, x, y)){
-                            int baseY = y * width * scale;
-                            data.put((baseY + (x * scale)) * 3 + 0, (byte) 0);
+                        if (elev >= WorldEngineTexture.HIGH_MOUNTAIN_LEVEL) {
+                            int baseY = y * width * scale * scale;
+                            data.put((baseY + (x * scale)) * 3 + 0, (byte) 255);
                             data.put((baseY + (x * scale)) * 3 + 1, (byte) 0);
-                            data.put((baseY + (x * scale)) * 3 + 2, (byte) 255);
-                        } else {
-                            for (int iy = 0; iy < scale; iy++) {
-                                for (int ix = 0; ix < scale; ix++) {
-                                    int baseY = (y + iy) * width * scale;
-                                    data.put((baseY + (x * scale) + ix) * 3 + 0, (byte) 0);
-                                    data.put((baseY + (x * scale) + ix) * 3 + 1, (byte) 255);
-                                    data.put((baseY + (x * scale) + ix) * 3 + 2, (byte) 0);
-                                }
-                            }
-                        }
-                    } else {
-                        double elev = worldFile.getHeightMapData().getRows(y).getCells(x);
-                        if (elev < MOUNTAIN_LEVEL) {
-                            for (int iy = 0; iy < scale; iy++) {
-                                for (int ix = 0; ix < scale; ix++) {
-                                    int baseY = (y + iy) * width * scale * scale;
-                                    data.put((baseY + (x * scale) + ix) * 3 + 0, (byte) 255);
-                                    data.put((baseY + (x * scale) + ix) * 3 + 1, (byte) 0);
-                                    data.put((baseY + (x * scale) + ix) * 3 + 2, (byte) 0);
-                                }
-                            }
+                            data.put((baseY + (x * scale)) * 3 + 2, (byte) 0);
+                        } else if (elev >= WorldEngineTexture.MOUNTAIN_LEVEL) {
+                            int baseY = y * width * scale * scale;
+                            data.put((baseY + (x * scale)) * 3 + 0, (byte) 0);
+                            data.put((baseY + (x * scale)) * 3 + 1, (byte) 255);
+                            data.put((baseY + (x * scale)) * 3 + 2, (byte) 0);
                         } else {
                             int baseY = y * width * scale * scale;
                             data.put((baseY + (x * scale)) * 3 + 0, (byte) 0);
                             data.put((baseY + (x * scale)) * 3 + 1, (byte) 0);
                             data.put((baseY + (x * scale)) * 3 + 2, (byte) 0);
                         }
+                    } else {
+                        int baseY = y * width * scale * scale;
+                        data.put((baseY + (x * scale)) * 3 + 0, (byte) 0);
+                        data.put((baseY + (x * scale)) * 3 + 1, (byte) 0);
+                        data.put((baseY + (x * scale)) * 3 + 2, (byte) 0);
                     }
                 }
             }

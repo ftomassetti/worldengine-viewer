@@ -6,14 +6,17 @@ MaterialDef Terrain {
         Boolean useTriPlanarMapping
 
 		Texture2D Alpha
+		Texture2D Alpha2
 		Texture2D Tex1
 		Texture2D Tex2
 		Texture2D Tex3
 		Texture2D Tex4
+		Texture2D Tex5
 		Float Tex1Scale
 		Float Tex2Scale
 		Float Tex3Scale
 		Float Tex4Scale
+		Float Tex5Scale
 	}
 
 	Technique {

@@ -82,7 +82,7 @@ public class App extends SimpleApplication implements ActionListener {
 
         /** 1. Create terrain material and load four textures into it. */
         mat_terrain = new Material(assetManager,
-                "Common/MatDefs/Terrain/Terrain.j3md");
+                "MatDefs/Terrain.j3md");
         
         //String worldEngineFile = "seed_64513.world";
         String worldEngineFile = "seed_1534.world";
@@ -91,6 +91,7 @@ public class App extends SimpleApplication implements ActionListener {
         /*mat_terrain.setTexture("Alpha", assetManager.loadTexture(
                 "Textures/Terrain/splat/alphamap.png"));*/
         mat_terrain.setTexture("Alpha", new WorldEngineTexture(worldEngineFile));
+        mat_terrain.setTexture("Alpha2", new WorldEngineTexture2(worldEngineFile));
 
         /** 1.2) Add GRASS texture into the red layer (Tex1). */
         Texture grass = assetManager.loadTexture(
@@ -112,6 +113,18 @@ public class App extends SimpleApplication implements ActionListener {
         rock.setWrap(WrapMode.Repeat);
         mat_terrain.setTexture("Tex3", rock);
         mat_terrain.setFloat("Tex3Scale", 128f);
+
+        Texture ice = assetManager.loadTexture(
+                "Textures/Terrain/splat/ice.jpg");
+        ice.setWrap(WrapMode.Repeat);
+        mat_terrain.setTexture("Tex4", ice);
+        mat_terrain.setFloat("Tex4Scale", 128f);
+
+        Texture mountain = assetManager.loadTexture(
+                "Textures/Terrain/splat/mountain.jpg");
+        mountain.setWrap(WrapMode.Repeat);
+        mat_terrain.setTexture("Tex5", mountain);
+        mat_terrain.setFloat("Tex5Scale", 128f);
 
         /** 2. Create the height map */
         AbstractHeightMap heightmap = null;
