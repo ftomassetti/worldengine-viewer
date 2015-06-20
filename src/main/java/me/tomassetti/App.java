@@ -18,6 +18,7 @@ import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.math.*;
+import com.jme3.post.FilterPostProcessor;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -29,6 +30,7 @@ import com.jme3.terrain.heightmap.ImageBasedHeightMap;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.WrapMode;
 import com.jme3.water.SimpleWaterProcessor;
+import com.jme3.water.WaterFilter;
 import com.sun.scenario.effect.AbstractShadow;
 
 import java.io.File;
@@ -53,6 +55,10 @@ public class App extends SimpleApplication implements ActionListener {
     
     private TerrainQuad terrain;
     Material mat_terrain;
+    private FilterPostProcessor fpp;
+    private WaterFilter water;
+    private Vector3f lightDir = new Vector3f(-4.9f, -1.3f, 5.9f); // same as light source
+    private float initialWaterHeight = -100.5f; // choose a value for your scene
 
     public static void main(String[] args) {
         App app = new App();
@@ -64,7 +70,8 @@ public class App extends SimpleApplication implements ActionListener {
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
         
-        flyCam.setMoveSpeed(9000000);
+        flyCam.setMoveSpeed(10000);
+        flyCam.setZoomSpeed(100000.f);
 
         setUpKeys();
         setUpLight();
@@ -77,7 +84,8 @@ public class App extends SimpleApplication implements ActionListener {
         mat_terrain = new Material(assetManager,
                 "Common/MatDefs/Terrain/Terrain.j3md");
         
-        String worldEngineFile = "seed_64513.world";
+        //String worldEngineFile = "seed_64513.world";
+        String worldEngineFile = "seed_1534.world";
 
         /** 1.1) Add ALPHA map (for red-blue-green coded splat textures) */
         /*mat_terrain.setTexture("Alpha", assetManager.loadTexture(
@@ -100,7 +108,7 @@ public class App extends SimpleApplication implements ActionListener {
 
         /** 1.4) Add ROAD texture into the blue layer (Tex3) */
         Texture rock = assetManager.loadTexture(
-                "Textures/Terrain/splat/road.jpg");
+                "Textures/Terrain/splat/dirt.jpg");
         rock.setWrap(WrapMode.Repeat);
         mat_terrain.setTexture("Tex3", rock);
         mat_terrain.setFloat("Tex3Scale", 128f);
@@ -112,6 +120,7 @@ public class App extends SimpleApplication implements ActionListener {
         heightmap = new ImageBasedHeightMap(heightMapImage.getImage());*/
         heightmap = new WorldEngineHeightMap(worldEngineFile);
         heightmap.load();
+        heightmap.erodeTerrain();
 
         /** 3. We have prepared material and heightmap.
          * Now we create the actual terrain:
@@ -122,7 +131,8 @@ public class App extends SimpleApplication implements ActionListener {
          * 3.5) We supply the prepared heightmap itself.
          */
         int patchSize = 65;
-        terrain = new TerrainQuad("my terrain", patchSize, 513, heightmap.getHeightMap());
+        int size = 1025;
+        terrain = new TerrainQuad("my terrain", patchSize, size, heightmap.getHeightMap());
 
         /** 4. We give the terrain its material, position & scale it, and attach it. */
         terrain.setMaterial(mat_terrain);
@@ -137,7 +147,7 @@ public class App extends SimpleApplication implements ActionListener {
         //Node node = terrain;
 
         // we create a water processor
-        SimpleWaterProcessor waterProcessor = new SimpleWaterProcessor(assetManager);
+        /*SimpleWaterProcessor waterProcessor = new SimpleWaterProcessor(assetManager);
         waterProcessor.setReflectionScene(terrain);
 
         // we set the water plane
@@ -160,7 +170,7 @@ public class App extends SimpleApplication implements ActionListener {
         water.setLocalTranslation(-200, -6, 2);
         //water.setShadowMode(AbstractShadow.ShadowMode.Receive);
         water.setMaterial(waterProcessor.getMaterial());
-        rootNode.attachChild(water);
+        rootNode.attachChild(water);*/
 
         CollisionShape sceneShape =
                 CollisionShapeFactory.createMeshShape((Node) terrain);
@@ -172,13 +182,19 @@ public class App extends SimpleApplication implements ActionListener {
         player.setJumpSpeed(200000);
         player.setFallSpeed(300000);
         player.setGravity(0);
-        player.setPhysicsLocation(new Vector3f(0, 10, 0));
+        player.setPhysicsLocation(new Vector3f(0, 2, 0));
 
         // We attach the scene and the player to the rootnode and the physics space,
         // to make them appear in the game world.
         rootNode.attachChild(terrain);
         bulletAppState.getPhysicsSpace().add(landscape);
         bulletAppState.getPhysicsSpace().add(player);
+
+        /*fpp = new FilterPostProcessor(assetManager);
+        water = new WaterFilter(rootNode, lightDir);
+        water.setWaterHeight(initialWaterHeight);
+        fpp.addFilter(water);
+        viewPort.addProcessor(fpp);*/
     }
 
     private void setUpLight() {
@@ -217,8 +233,8 @@ public class App extends SimpleApplication implements ActionListener {
      */
     @Override
     public void simpleUpdate(float tpf) {
-        camDir.set(cam.getDirection()).multLocal(0.6f);
-        camLeft.set(cam.getLeft()).multLocal(0.4f);
+        camDir.set(cam.getDirection()).multLocal(10.f*0.6f);
+        camLeft.set(cam.getLeft()).multLocal(10.f*0.4f);
         walkDirection.set(0, 0, 0);
         if (left) {
             walkDirection.addLocal(camLeft);

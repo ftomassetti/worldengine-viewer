@@ -14,24 +14,44 @@ import java.nio.ByteBuffer;
  * Created by ftomassetti on 19/06/15.
  */
 public class WorldEngineTexture extends Texture2D {
+    
+    private boolean isBeach(WorldFile.World worldFile, int x, int y){
+        int delta = 2;
+        for (int dx=-delta;dx<=delta && (dx+x)>=0 && (dx+x)<worldFile.getWidth();dx++){
+            for (int dy=-delta;dy<=delta && (dy+y)>=0 && (dy+y)<worldFile.getHeight();dy++){
+                if (!worldFile.getOcean().getRows(y+dy).getCells(x+dx)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     public WorldEngineTexture(String fileName){
-        final int width = 512;
-        final int height = 512;
         final int scale = 1;
         try {
             
             WorldFile.World worldFile = WorldFile.World.parseFrom(new FileInputStream(new File(fileName)));
+            final int width = worldFile.getWidth();
+            final int height = worldFile.getHeight();
             ByteBuffer data = ByteBuffer.allocateDirect(width * height * 3 * scale * scale);
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
                     if (worldFile.getOcean().getRows(y).getCells(x)) {
-                        for (int iy=0;iy<scale;iy++){
-                            for (int ix=0;ix<scale;ix++){
-                                int baseY = (y+iy) * width * scale;
-                                data.put((baseY + (x * scale)  +ix )* 3 + 0, (byte) 0);
-                                data.put((baseY + (x * scale)  +ix )* 3 + 1, (byte) 255);
-                                data.put((baseY + (x * scale)  +ix )* 3 + 2, (byte) 0);
+                        double elev = worldFile.getHeightMapData().getRows(y).getCells(x);
+                        if (isBeach(worldFile, x, y)){
+                            int baseY = y * width * scale;
+                            data.put((baseY + (x * scale)) * 3 + 0, (byte) 0);
+                            data.put((baseY + (x * scale)) * 3 + 1, (byte) 0);
+                            data.put((baseY + (x * scale)) * 3 + 2, (byte) 255);
+                        } else {
+                            for (int iy = 0; iy < scale; iy++) {
+                                for (int ix = 0; ix < scale; ix++) {
+                                    int baseY = (y + iy) * width * scale;
+                                    data.put((baseY + (x * scale) + ix) * 3 + 0, (byte) 0);
+                                    data.put((baseY + (x * scale) + ix) * 3 + 1, (byte) 255);
+                                    data.put((baseY + (x * scale) + ix) * 3 + 2, (byte) 0);
+                                }
                             }
                         }
                     } else {
