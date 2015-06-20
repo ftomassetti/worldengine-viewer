@@ -59,6 +59,42 @@ public class WorldEngineTexture {
     private void setBlue(ByteBuffer bb, int x, int baseY){
         bb.put((baseY + x) * 3 + 2, (byte) 255);
     }    
+    
+    private boolean isSandDesert(int biomeIndex){
+        switch (biomeIndex){
+            case 19:case 20:case 26:case 27:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private boolean isRockDesert(int biomeIndex){
+        switch (biomeIndex){
+            case 34:case 35:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private boolean isForest(int biomeIndex){
+        switch (biomeIndex){
+            case 7:case 8:case 10:case 21: case 28: case 32:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private boolean isJungle(int biomeIndex){
+        switch (biomeIndex){
+            case 22:case 23:case 29:case 30:
+                return true;
+            default:
+                return false;
+        }
+    }
 
     public WorldEngineTexture(String fileName){
         try {
@@ -87,10 +123,32 @@ public class WorldEngineTexture {
                             setGreen(data1, x, baseY);
                         }
                     } else {
-                        if (elev >= HIGH_MOUNTAIN_LEVEL) {
+//                        sand desert
+//                        19 20
+//                        26 27
+//
+//                        rock desert
+//                        34 35
+//
+//                        forest
+//                        21 28 32 7 8 10
+//
+//                        jungle
+//                        22 23 29 30
+
+                        int biomeIndex = worldFile.getBiome().getRows(y).getCells(x);
+                        if (isSandDesert(biomeIndex)) {
+                            setBlue(data2, x, baseY);
+                        } else if (isRockDesert(biomeIndex)) {
+                            setRed(data3, x, baseY);
+                        } else if (isForest(biomeIndex)) {
+                            setGreen(data3, x, baseY);
+                        } else if (isJungle(biomeIndex)) {
+                            setBlue(data3, x, baseY);
+                        } else if (elev >= HIGH_MOUNTAIN_LEVEL) {
                             setRed(data2, x, baseY);
                         } else if (elev >= MOUNTAIN_LEVEL) {
-                            setGreen(data2, x, baseY);
+                                setGreen(data2, x, baseY);
                         } else {
                             setRed(data1, x, baseY);
                         }

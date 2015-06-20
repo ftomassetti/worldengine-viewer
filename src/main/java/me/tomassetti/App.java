@@ -128,6 +128,30 @@ public class App extends SimpleApplication implements ActionListener {
         mat_terrain.setTexture("Tex5", mountain);
         mat_terrain.setFloat("Tex5Scale", 128f);
 
+        Texture sandDesert = assetManager.loadTexture(
+                "Textures/Terrain/splat/sanddesert.jpg");
+        sandDesert.setWrap(WrapMode.Repeat);
+        mat_terrain.setTexture("Tex6", sandDesert);
+        mat_terrain.setFloat("Tex6Scale", 128f);
+
+        Texture rockDesert = assetManager.loadTexture(
+                "Textures/Terrain/splat/rockdesert.jpg");
+        rockDesert.setWrap(WrapMode.Repeat);
+        mat_terrain.setTexture("Tex7", rockDesert);
+        mat_terrain.setFloat("Tex7Scale", 128f);
+
+        Texture forest = assetManager.loadTexture(
+                "Textures/Terrain/splat/forest.jpg");
+        forest.setWrap(WrapMode.Repeat);
+        mat_terrain.setTexture("Tex8", forest);
+        mat_terrain.setFloat("Tex8Scale", 128f);
+
+        Texture jungle = assetManager.loadTexture(
+                "Textures/Terrain/splat/jungle.jpg");
+        jungle.setWrap(WrapMode.Repeat);
+        mat_terrain.setTexture("Tex9", jungle);
+        mat_terrain.setFloat("Tex9Scale", 128f);
+
         /** 2. Create the height map */
         AbstractHeightMap heightmap = null;
         /*Texture heightMapImage = assetManager.loadTexture(

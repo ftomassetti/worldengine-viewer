@@ -13,11 +13,19 @@ MaterialDef Terrain {
 		Texture2D Tex3
 		Texture2D Tex4
 		Texture2D Tex5
+		Texture2D Tex6
+		Texture2D Tex7
+		Texture2D Tex8
+		Texture2D Tex9
 		Float Tex1Scale
 		Float Tex2Scale
 		Float Tex3Scale
 		Float Tex4Scale
 		Float Tex5Scale
+		Float Tex6Scale
+		Float Tex7Scale
+		Float Tex8Scale
+		Float Tex9Scale
 	}
 
 	Technique {
