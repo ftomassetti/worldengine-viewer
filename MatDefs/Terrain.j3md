@@ -7,6 +7,7 @@ MaterialDef Terrain {
 
 		Texture2D Alpha
 		Texture2D Alpha2
+		Texture2D Alpha3
 		Texture2D Tex1
 		Texture2D Tex2
 		Texture2D Tex3

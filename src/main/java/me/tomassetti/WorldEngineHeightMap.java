@@ -1,5 +1,6 @@
 package me.tomassetti;
 
+import com.google.protobuf.CodedInputStream;
 import com.jme3.terrain.heightmap.AbstractHeightMap;
 import me.tomassetti.worldengine.WorldFile;
 import org.lwjgl.Sys;
@@ -23,7 +24,9 @@ public class WorldEngineHeightMap extends AbstractHeightMap {
     @Override
     public boolean load() {
         try {
-            WorldFile.World worldFile = WorldFile.World.parseFrom(new FileInputStream(new File(this.worldFilename)));
+            CodedInputStream codedInputStream = CodedInputStream.newInstance(new FileInputStream(new File(worldFilename)));
+            codedInputStream.setSizeLimit(Integer.MAX_VALUE);
+            WorldFile.World worldFile = WorldFile.World.parseFrom(codedInputStream);
             this.size = Math.max(worldFile.getWidth(), worldFile.getHeight());
             this.heightData = new float[this.getSize() * this.getSize()];
             float minValue = Float.MAX_VALUE;

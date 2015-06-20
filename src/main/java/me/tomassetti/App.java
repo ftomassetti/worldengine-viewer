@@ -85,7 +85,7 @@ public class App extends SimpleApplication implements ActionListener {
                 "MatDefs/Terrain.j3md");
         
         //String worldEngineFile = "seed_64513.world";
-        String worldEngineFile = "seed_1534.world";
+        String worldEngineFile = "seed_59416.world";
 
         /** 1.1) Add ALPHA map (for red-blue-green coded splat textures) */
         /*mat_terrain.setTexture("Alpha", assetManager.loadTexture(
@@ -93,6 +93,7 @@ public class App extends SimpleApplication implements ActionListener {
         WorldEngineTexture worldEngineTexture = new WorldEngineTexture(worldEngineFile);
         mat_terrain.setTexture("Alpha", worldEngineTexture.getAlpha1());
         mat_terrain.setTexture("Alpha2", worldEngineTexture.getAlpha2());
+        mat_terrain.setTexture("Alpha3", worldEngineTexture.getAlpha3());
 
         /** 1.2) Add GRASS texture into the red layer (Tex1). */
         Texture grass = assetManager.loadTexture(

@@ -1,5 +1,6 @@
 package me.tomassetti;
 
+import com.google.protobuf.CodedInputStream;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture2D;
 import com.jme3.texture.Image;
@@ -61,7 +62,9 @@ public class WorldEngineTexture {
 
     public WorldEngineTexture(String fileName){
         try {
-            WorldFile.World worldFile = WorldFile.World.parseFrom(new FileInputStream(new File(fileName)));
+            CodedInputStream codedInputStream = CodedInputStream.newInstance(new FileInputStream(new File(fileName)));
+            codedInputStream.setSizeLimit(Integer.MAX_VALUE);
+            WorldFile.World worldFile = WorldFile.World.parseFrom(codedInputStream);
             final int width = worldFile.getWidth();
             final int height = worldFile.getHeight();
             ByteBuffer data1 = ByteBuffer.allocateDirect(width * height * 3);
