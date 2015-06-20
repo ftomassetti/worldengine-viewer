@@ -90,8 +90,9 @@ public class App extends SimpleApplication implements ActionListener {
         /** 1.1) Add ALPHA map (for red-blue-green coded splat textures) */
         /*mat_terrain.setTexture("Alpha", assetManager.loadTexture(
                 "Textures/Terrain/splat/alphamap.png"));*/
-        mat_terrain.setTexture("Alpha", new WorldEngineTexture(worldEngineFile));
-        mat_terrain.setTexture("Alpha2", new WorldEngineTexture2(worldEngineFile));
+        WorldEngineTexture worldEngineTexture = new WorldEngineTexture(worldEngineFile);
+        mat_terrain.setTexture("Alpha", worldEngineTexture.getAlpha1());
+        mat_terrain.setTexture("Alpha2", worldEngineTexture.getAlpha2());
 
         /** 1.2) Add GRASS texture into the red layer (Tex1). */
         Texture grass = assetManager.loadTexture(
